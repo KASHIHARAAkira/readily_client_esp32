@@ -28,6 +28,7 @@
 
 #include "Arduino.h"
 #include "ReadilyClient.h"
+#include <WiFiClientSecure.h>
 
 ReadilyClient::ReadilyClient(int timeout)
 {
@@ -38,7 +39,6 @@ ReadilyClient::ReadilyClient(int timeout)
 int ReadilyClient::verifyCA()
 {  
   client.setCACert(_root_ca);
-  return 0;
 
   if (!client.connect(_server, 443)) {
     return -1;
@@ -47,28 +47,29 @@ int ReadilyClient::verifyCA()
   }
 };
 
-int ReadilyClient::getTime() {
+String ReadilyClient::getTime() {
   client.println("GET https://api.readily.online/time HTTP/1.0");
-  // client.println("Host: api.readily.online");
-  // client.println("Connection: close");
-  // client.println();
+  client.println("Host: api.readily.online");
+  client.println("Connection: close");
+  client.println();
 
-  // while (client.connected()) {
-  //   String line = client.readStringUntil('\n');
-  //   if (line == "\r") {
-  //     Serial.println("headers received");
-  //     break;
-  //   }
-  // }
-  // // if there are incoming bytes available
-  // // from the server, read them and print them:
-  // while (client.available()) {
-  //   char c = client.read();
-  //   Serial.write(c);
-  // }
-
-  // client.stop();
-}
+  while (client.connected()) {
+    String line = client.readStringUntil('\n');
+    if (line == "\r") {
+      // Serial.println("headers received");
+      break;
+    }
+  }
+  // if there are incoming bytes available
+  // from the server, read them and print them:
+  int lineNum = 0;
+  String resultLine;
+  while (client.available()) {
+    resultLine = client.readStringUntil('\r');
+    lineNum++;
+  }
+  return resultLine;
+};
 
 // Morse::Morse(int pin){
 //   pinMode(pin, OUTPUT);

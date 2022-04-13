@@ -35,7 +35,7 @@ class ReadilyClient{
   public:
     ReadilyClient(int timeout);
     int verifyCA();
-    int getTime();
+    String getTime();
   private:
    int _timeout;
    WiFiClientSecure client;
