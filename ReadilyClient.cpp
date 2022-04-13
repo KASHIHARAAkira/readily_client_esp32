@@ -71,6 +71,42 @@ String ReadilyClient::getTime() {
   return resultLine;
 };
 
+String ReadilyClient::refreshToken(String refreshToken) {
+  const char* path = "https://api.readily.online/refresh_token";
+  const String json = "{\"refresh_token\": \"" + refreshToken + "\"}";
+
+  Serial.print("requesting URL:");
+  Serial.println(path);
+
+  client.println("POST https://api.readily.online/refresh_token HTTP/1.0");
+  client.println("Host: api.readily.online");
+  client.println("Content-Type: application/json");
+  client.println("Content-Length:" + String(json.length()));
+  client.println();
+  client.println(json);
+  client.println();
+
+  Serial.println("request sent");
+  while (client.connected()) {
+    String line = client.readStringUntil('\n');
+    if (line == "\r") {
+      // Serial.println("headers received");
+      break;
+    }
+  }
+
+  int lineNum = 0;
+  String resultLine;
+  while (client.available()) {
+    resultLine = client.readStringUntil('\r');
+    lineNum++;
+    // char c = client.read();
+    // Serial.write(c);
+  }
+
+  return resultLine;
+  client.stop();
+}
 // Morse::Morse(int pin){
 //   pinMode(pin, OUTPUT);
 //   _pin = pin;}

@@ -36,6 +36,7 @@ class ReadilyClient{
     ReadilyClient(int timeout);
     int verifyCA();
     String getTime();
+    String refreshToken(String refreshToken);
   private:
    int _timeout;
    WiFiClientSecure client;
