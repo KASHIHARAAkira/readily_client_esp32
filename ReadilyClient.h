@@ -22,10 +22,6 @@
   SOFTWARE.
 */
 
-/*Morse.h - Library for flashing Morse code.
-  Created by David A. Mellis, November 2, 2007.
-  Released into the public domain.*/
-
 #ifndef Readily_Client_h
 #define Readily_Client_h
 #include "Arduino.h"
@@ -37,6 +33,7 @@ class ReadilyClient{
     int verifyCA();
     String getTime();
     String refreshToken(String refreshToken);
+    String uploadData(String accessToken, String chartId, float payload[], int sizePayload);
   private:
    int _timeout;
    WiFiClientSecure client;
@@ -74,13 +71,4 @@ class ReadilyClient{
                                 "emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=\n" \
                                 "-----END CERTIFICATE-----\n";
 };
-
-// class Morse{
-//   public:
-//     Morse(int pin);
-//     void dot();
-//     void dash();
-//   private:
-//     int _pin;};
-
 #endif

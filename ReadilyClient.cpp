@@ -22,10 +22,6 @@
   SOFTWARE.
 */
 
-/*Morse.cpp - Library for flashing Morse code.
-  Created by David A. Mellis, November 2, 2007.
-  Released into the public domain.*/
-
 #include "Arduino.h"
 #include "ReadilyClient.h"
 #include <WiFiClientSecure.h>
@@ -69,6 +65,7 @@ String ReadilyClient::getTime() {
     lineNum++;
   }
   return resultLine;
+  client.stop();
 };
 
 String ReadilyClient::refreshToken(String refreshToken) {
@@ -107,18 +104,44 @@ String ReadilyClient::refreshToken(String refreshToken) {
   return resultLine;
   client.stop();
 }
-// Morse::Morse(int pin){
-//   pinMode(pin, OUTPUT);
-//   _pin = pin;}
 
-// void Morse::dot(){
-//   digitalWrite(_pin, HIGH);
-//   delay(250);
-//   digitalWrite(_pin, LOW);
-//   delay(250);  }
+String ReadilyClient::uploadData(String accessToken, String chartId, float payload[], int sizePayload) {
+  const String path = "https://api.readily.online/upload?chartId=" + chartId;
+  String arrayData = "[[";
+  //make data
+  for (int i = 0; i < sizePayload - 1; i++) {
+    arrayData += String(payload[i]);
+    arrayData += ",";
+  }
+  arrayData += String(payload[sizePayload - 1]);
+  arrayData += "]]";
+  const String json = "{\"access_token\": \"" + accessToken + "\", \"data\": " + arrayData + "}";
 
-// void Morse::dash(){
-//   digitalWrite(_pin, HIGH);
-//   delay(1000);
-//   digitalWrite(_pin, LOW);
-//   delay(250);}
+  client.println("POST " + path + " HTTP/1.0");
+  client.println("Host: api.readily.online");
+  client.println("Content-Type: application/json");
+  client.println("Content-Length:" + String(json.length()));
+  client.println();
+  client.println(json);
+  client.println();
+
+  Serial.println("request sent");
+  while (client.connected()) {
+    String line = client.readStringUntil('\n');
+    if (line == "\r") {
+      // Serial.println("headers received");
+      break;
+    }
+  }
+
+  int lineNum = 0;
+  String resultLine;
+  while (client.available()) {
+    resultLine = client.readStringUntil('\r');
+    lineNum++;
+    // char c = client.read();
+    // Serial.write(c);
+  }
+  return resultLine;
+  client.stop();
+}
